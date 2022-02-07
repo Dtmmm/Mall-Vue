@@ -225,7 +225,9 @@ export default {
     // 生成随机消费额
     randomConsumption(){
       for (let i = 0; i <12; i++) {
-        if (Math.random()<=0.5){
+        if (this.pageviews[i] === 0){
+          this.consumption[i] = 0;
+        } else if (Math.random()<=0.5){
           this.consumption[i] = 0;
         } else {
           this.consumption[i] = this.randomNum(0,300);

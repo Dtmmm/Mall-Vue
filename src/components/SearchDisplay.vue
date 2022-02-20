@@ -55,9 +55,10 @@
       <el-pagination
           background
           layout="prev, pager, next"
-          :page-size="10"
+          :page-size="8"
           :total="total"
           @current-change="page"
+          hide-on-single-page
           v-show="total!=null">
       </el-pagination>
     </div>
@@ -74,10 +75,10 @@ export default {
         scope: this.scope,
         classification: this.classification,
         currentPage: currentPage,
-        pageSize:10
+        pageSize:8
       };
       const _this = this;
-      axios.post("http://localhost:8081/book/selectBookByKeyWord",{data:JSON.stringify(data)})
+      axios.post("http://localhost:8081/book/selectBookByKeyWord",data)
           .then(function (resp){
             _this.books = resp.data.books;
             _this.total = resp.data.total;
@@ -183,7 +184,7 @@ export default {
         scope: JSON.parse(scope),
         classification: JSON.parse(classification),
         currentPage:1,
-        pageSize:10
+        pageSize:8
       };
       axios.post("http://localhost:8081/book/selectBookByKeyWord",data)
           .then((resp) => {

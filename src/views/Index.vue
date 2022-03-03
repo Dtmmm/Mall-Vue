@@ -21,7 +21,7 @@
             style="margin-top: 2px;margin-bottom: 2px"
             trigger="click"
             v-model="visible">
-          <p>去往Github上查看源码？</p>
+          <p>去 Github 下载项目？</p>
           <div style="text-align: right; margin: 0">
             <el-button size="mini" type="text" @click="visible = false">不用了</el-button>
             <el-button type="primary" size="mini" @click="openGithub">出发 !</el-button>
@@ -397,91 +397,11 @@
         </el-dialog>
 
         <!--我的购物车-->
-        <el-button id="ShowCartBtn" size="medium" icon="el-icon-shopping-cart-1" @click="showCartInfo"
+        <el-button id="ShowCartBtn" size="medium" icon="el-icon-shopping-cart-1" @click="showCartInfo()"
                    type="primary" style="margin-left: 16px;">
           我的购物车
         </el-button>
-        <el-drawer
-            title="DengDeng-plus"
-            :visible.sync="drawer_cart"
-            :direction="direction"
-            style="width: 150%">
-          <el-divider content-position="left"><i class="el-icon-shopping-cart-2"></i> 我的购物车</el-divider>
-          <el-table
-              :data="cartData"
-              style="margin-top: 40px;width: 100%;"
-              show-summary
-              :summary-method="getSummaries"
-              highlight-current-row
-              v-loading="loading"
-              empty-text="这里什么都没有..."
-              @selection-change="handleSelectionChange"
-              height="500">
-            <el-table-column
-                type="selection"
-                width="55">
-            </el-table-column>
-            <el-table-column>
-              <template slot-scope="scope">
-                <el-popover placement="right" title="" trigger="hover">
-                  <img :src="scope.row.img" alt="" style="width: 150px;height: 170px">
-                  <img slot="reference" :src="scope.row.img" style="width: 50px;height: 55px">
-                </el-popover>
-              </template>
-            </el-table-column>
-            <el-table-column
-                prop="bookName"
-                label="书名"
-                width="120">
-            </el-table-column>
-            <el-table-column
-                prop="quantity"
-                label="数量"
-                sortable
-                width="80">
-            </el-table-column>
-            <el-table-column
-                prop="discountPrice"
-                label="单价(元)"
-                sortable
-                width="120">
-            </el-table-column>
-            <el-table-column
-                prop="author"
-                label="作者"
-                width="120">
-            </el-table-column>
-            <el-table-column
-                prop="press"
-                label="出版社"
-                width="120">
-            </el-table-column>
-            <el-table-column
-                fixed="right"
-                label="操作"
-                width="150">
-              <template slot-scope="scope">
-                <el-button @click="bookDetail_cart(scope.row.bookId)" style="margin-left: 5px" type="text"
-                           size="medium">查看详情
-                </el-button>
-                <el-button
-                    @click.native.prevent="deleteRow_cart(cartData,scope.row.bookId,scope.row.quantity)"
-                    style="margin-left: 15px"
-                    type="text"
-                    size="medium">
-                  移除<i class="el-icon-delete"></i>
-                </el-button>
-                <el-input-number @change="(currentValue,oldValue) => changeQuantity(currentValue,oldValue,scope.row)"
-                                 v-model="scope.row.quantity" controls-position="right" size="mini"
-                                 :step="1" step-strictly :min="1" :max="99"></el-input-number>
-              </template>
-            </el-table-column>
-          </el-table>
-          <el-button v-if="multipleSelection.length>0" class="CheckBtn" @click="beforeCheck" icon="el-icon-sell" type="primary"
-                     round>结算 ({{multipleSelection.length}})
-          </el-button>
-          <el-button v-else class="CheckBtn" disabled icon="el-icon-sell" type="primary" round>结 算</el-button>
-        </el-drawer>
+        <!--由于游客也能访问购物车，因此将购物车的dialog提到if-else外面-->
         <el-dialog :before-close="cancelCheck" title="结算" :visible.sync="checkTable"
                    style="overflow-y: hidden;margin-top: -90px">
           <el-table :data="multipleSelection" height="400">
@@ -805,11 +725,93 @@
                    style="margin-left: 16px;">
           去登录
         </el-button>
-        <el-button id="SuggestionBtn" size="medium" icon="el-icon-s-comment" @click="suggestion" type="primary"
-                   style="margin-left: 16px;">
-          反馈 / 建议
+        <el-button id="ShowCartBtn-visitor" size="medium" icon="el-icon-shopping-cart-1" @click="showCartInfo()"
+                   type="primary" style="margin-left: 16px;">
+          我的购物车
         </el-button>
       </div>
+      <!--由于游客也能访问购物车，因此将购物车的dialog提到if-else外面-->
+      <el-drawer
+          title="DengDeng-plus"
+          :visible.sync="drawer_cart"
+          :direction="direction"
+          style="width: 150%">
+        <el-divider content-position="left"><i class="el-icon-shopping-cart-2"></i> 我的购物车</el-divider>
+        <el-table
+            :data="cartData"
+            style="margin-top: 40px;width: 100%;"
+            show-summary
+            :summary-method="getSummaries"
+            highlight-current-row
+            v-loading="loading"
+            empty-text="这里什么都没有..."
+            @selection-change="handleSelectionChange"
+            height="500">
+          <el-table-column
+              type="selection"
+              width="55">
+          </el-table-column>
+          <el-table-column>
+            <template slot-scope="scope">
+              <el-popover placement="right" title="" trigger="hover">
+                <img :src="scope.row.img" alt="" style="width: 150px;height: 170px">
+                <img slot="reference" :src="scope.row.img" style="width: 50px;height: 55px">
+              </el-popover>
+            </template>
+          </el-table-column>
+          <el-table-column
+              prop="bookName"
+              label="书名"
+              width="120">
+          </el-table-column>
+          <el-table-column
+              prop="quantity"
+              label="数量"
+              sortable
+              width="80">
+          </el-table-column>
+          <el-table-column
+              prop="discountPrice"
+              label="单价(元)"
+              sortable
+              width="120">
+          </el-table-column>
+          <el-table-column
+              prop="author"
+              label="作者"
+              width="120">
+          </el-table-column>
+          <el-table-column
+              prop="press"
+              label="出版社"
+              width="120">
+          </el-table-column>
+          <el-table-column
+              fixed="right"
+              label="操作"
+              width="150">
+            <template slot-scope="scope">
+              <el-button @click="bookDetail_cart(scope.row.bookId)" style="margin-left: 5px" type="text"
+                         size="medium">查看详情
+              </el-button>
+              <el-button
+                  @click.native.prevent="deleteRow_cart(cartData,scope.row.bookId,scope.row.quantity)"
+                  style="margin-left: 15px"
+                  type="text"
+                  size="medium">
+                移除<i class="el-icon-delete"></i>
+              </el-button>
+              <el-input-number @change="(currentValue,oldValue) => changeQuantity(currentValue,oldValue,scope.row)"
+                               v-model="scope.row.quantity" controls-position="right" size="mini"
+                               :step="1" step-strictly :min="1" :max="99"></el-input-number>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-button v-if="multipleSelection.length>0" class="CheckBtn" @click="beforeCheck" icon="el-icon-sell" type="primary"
+                   round>结算 ({{multipleSelection.length}})
+        </el-button>
+        <el-button v-else class="CheckBtn" disabled icon="el-icon-sell" type="primary" round>结 算</el-button>
+      </el-drawer>
     </div>
     <router-view :key="$route.path"></router-view>
     <!--页面底部-->
@@ -1149,15 +1151,33 @@ export default {
       commentContents: [],
       colors: ['#99A9BF', '#F7BA2A', '#FF9900'],
       dealId_comment: '',
-      multipleSelection: []
+      multipleSelection: [],
+      visitorId: ''
     };
   },
   created() {
     this.activeIndex = null;
     this.id = sessionStorage.getItem("id");
     this.userName = sessionStorage.getItem("userName");
+    if (sessionStorage.getItem("id") == null){
+      let visitorId = this.getVisitorId();
+      sessionStorage.setItem("visitorId",visitorId);
+      this.visitorId = visitorId;
+    }
   },
   methods: {
+    // 为游客生成id
+    getVisitorId(){
+      let s = [];
+      let hexDigits = '0123456789abcdef';
+      for (let i = 0; i < 24; i++) {
+        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+      }
+      s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);
+
+      let id = "visitor_"+s.join('');
+      return id;
+    },
     // 打开我的Github
     openGithub() {
       this.visible = false;
@@ -1253,9 +1273,11 @@ export default {
     },
     // 打开购物车
     showCartInfo() {
+      // 判断是否是游客
+      let id = sessionStorage.getItem("id")==null?this.visitorId:this.id;
       this.loading = true;
       this.drawer_cart = true;
-      axios.get("http://localhost:8081/user/cartInfo/" + this.id)
+      axios.get("http://localhost:8081/user/cartInfo/" + id)
           .then((resp) => {
             this.cartData = resp.data;
             this.loading = false;
@@ -1268,8 +1290,10 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        // 判断是否是游客
+        let id = sessionStorage.getItem("id")==null?this.visitorId:this.id;
         let formData = new FormData();
-        formData.append("id", this.id);
+        formData.append("id", id);
         formData.append("bookId", bookId);
         formData.append("quantity", quantity);
         axios({
@@ -1323,8 +1347,10 @@ export default {
     },
     // 改变购物车中图书数量
     changeQuantity(currentValue, oldValue, row) {
+      // 判断是否是游客
+      let id = sessionStorage.getItem("id")==null?this.visitorId:this.id;
       let formData = new FormData();
-      formData.append("id", this.id);
+      formData.append("id", id);
       formData.append("bookId", row.bookId);
       formData.append("quantity", row.quantity);
       formData.append("currentValue", currentValue);
@@ -1357,15 +1383,22 @@ export default {
     },
     // 结算功能
     beforeCheck() {
-      this.drawer_cart = false;
-      this.loading = true;
-      this.checkTable = true;
-      this.payWay = '支付宝';
-      axios.get("http://localhost:8081/user/selectUserById/" + this.id)
-          .then((resp) => {
-            this.userInfo = resp.data;
-            this.loading = false;
-          });
+      if (sessionStorage.getItem("id") == null){
+        this.$message({
+          type: 'warning',
+          message: '您还未登录，登录后才能进行结算！'
+        });
+      } else {
+        this.drawer_cart = false;
+        this.loading = true;
+        this.checkTable = true;
+        this.payWay = '支付宝';
+        axios.get("http://localhost:8081/user/selectUserById/" + this.id)
+            .then((resp) => {
+              this.userInfo = resp.data;
+              this.loading = false;
+            });
+      }
     },
     // 结算
     check(state) {
@@ -1391,7 +1424,7 @@ export default {
                   message: '结算成功！'
                 });
               }
-              if (state === 5) {
+              if (state === 6) {
                 this.$message({
                   showClose: true,
                   type: 'warning',
@@ -1780,30 +1813,15 @@ export default {
     logout() {
       this.userName = null;
       sessionStorage.clear();
+      // 重新生成一个游客的编号
+      let visitorId = this.getVisitorId();
+      sessionStorage.setItem("visitorId",visitorId);
+      this.visitorId = visitorId;
     },
     // 点击Logo，跳回主页
     clickLogo() {
       this.activeIndex = null;
       this.$router.push("/Home");
-    },
-    // 建议
-    suggestion() {
-      this.$prompt('请填写您的反馈或者建议', '反馈/建议', {
-        confirmButtonText: '提交',
-        cancelButtonText: '取消',
-        inputPattern: /\S/,
-        inputErrorMessage: '内容不能为空'
-      }).then(({value}) => {
-        this.$message({
-          type: 'success',
-          message: '提交成功，感谢您的反馈/建议'
-        });
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '取消输入'
-        });
-      });
     }
   }
 }
@@ -1882,7 +1900,7 @@ export default {
   margin-top: 275px;
 }
 
-#SuggestionBtn {
+#ShowCartBtn-visitor {
   text-align: center;
   position: fixed;
   width: 135px;

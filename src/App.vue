@@ -5,6 +5,20 @@
 </template>
 
 <script>
+export default {
+  // 监听窗口关闭时，清空Redis中游客购物车的缓存
+  mounted() {
+    window.addEventListener('beforeunload', event => {
+      let visitorId = sessionStorage.getItem("visitorId");
+      if (visitorId != null){
+        axios.get("http://localhost:8081/user/clearVisitorCart/" + visitorId);
+      }
+    });
+  },
+  destroyed() {
+    window.removeEventListener('beforeunload', event =>{});
+  }
+}
 </script>
 
 <style>

@@ -29,7 +29,7 @@
                     <el-form-item>
                       <div>
                         <el-button style="width: 100px" type="primary" :loading="loadingBtn" @click="login('loginForm')">登 录</el-button>
-                        <el-button style="margin-left: 110px;width: 100px" @click="toRegister" plain>去注册</el-button>
+                        <el-button style="margin-left: 110px;width: 100px" @click="toRegister" plain>去注册 <i class="el-icon-caret-right"></i></el-button>
                       </div>
                     </el-form-item>
                   </el-form>
@@ -69,7 +69,7 @@
                       <div :class="registerForm.result === 0?'showError':'hiddenError'" id="errorText">用户名或密码错误</div>
                       <el-form-item>
                         <div>
-                          <el-button style="width: 100px" @click="toLogin" plain>去登录</el-button>
+                          <el-button style="width: 100px" @click="toLogin" plain><i class="el-icon-caret-left"></i> 去登录</el-button>
                           <el-button style="margin-left: 100px;width: 100px" :loading="loadingBtn"
                                      type="primary" @click="register('registerForm')">注 册
                           </el-button>
@@ -236,6 +236,11 @@ export default {
               sessionStorage.setItem("id", resp.data.id);
               sessionStorage.setItem("userName", resp.data.userName);
               sessionStorage.setItem("flag", "1");
+              // 游客登录后，将购物车信息更新合并，并删除之前的信息
+              if (sessionStorage.getItem("visitorId")!=null){
+                this.updateVisitorToUser(sessionStorage.getItem("visitorId"),resp.data.id);
+                sessionStorage.removeItem("visitorId");
+              }
               this.$router.push("/Home");
             } else if (resp.data.result === 2) {
               this.$router.push("/Backstage");
@@ -306,6 +311,10 @@ export default {
     // 键盘回车登录
     key_Login(){
       this.login('loginForm')
+    },
+    // 游客登录后，将购物车信息更新合并，并删除之前的信息
+    updateVisitorToUser(visitorId,userId){
+      axios.get("http://localhost:8081/user/updateVisitorToUser/"+visitorId+"/"+userId);
     }
   },
   created() {

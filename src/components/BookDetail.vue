@@ -238,44 +238,46 @@ export default {
     addToCart() {
       let id = sessionStorage.getItem("id");
       if (id == null) {
+        id = sessionStorage.getItem("visitorId");
         this.$message({
           type: 'warning',
-          message: '您还未登录，请先登录！'
-        });
-      } else {
-        this.loadingBtn = true;
-        let formData = new FormData();
-        formData.append("id", sessionStorage.getItem("id"));
-        formData.append("bookId", this.book.id);
-        formData.append("quantity", this.quantity);
-        axios({
-          method: "post",
-          url: "http://localhost:8081/user/addToCart",
-          headers: {
-            "Content-Type": "multipart/form-data"
-          },
-          withCredentials: true,
-          data: formData
-        }).then((resp) => {
-          this.loadingBtn = false;
-          if (resp.data === 1) {
-            this.$message({
-              type: 'success',
-              message: '添加成功！'
-            });
-          } else if (resp.data === 0) {
-            this.$message({
-              type: 'error',
-              message: '添加失败，库存不足'
-            });
-          } else {
-            this.$message({
-              showClose: true, type: 'error',
-              message: '操作失败，请重试'
-            });
-          }
+          message: '您当前未登录，购物车中的内容会随着会话结束而消失，请尽快登录！',
+          duration: 9000,
+          showClose: true
         });
       }
+      this.loadingBtn = true;
+      let formData = new FormData();
+      formData.append("id", id);
+      formData.append("bookId", this.book.id);
+      formData.append("quantity", this.quantity);
+      axios({
+        method: "post",
+        url: "http://localhost:8081/user/addToCart",
+        headers: {
+          "Content-Type": "multipart/form-data"
+        },
+        withCredentials: true,
+        data: formData
+      }).then((resp) => {
+        this.loadingBtn = false;
+        if (resp.data === 1) {
+          this.$message({
+            type: 'success',
+            message: '添加成功！'
+          });
+        } else if (resp.data === 0) {
+          this.$message({
+            type: 'error',
+            message: '添加失败，库存不足'
+          });
+        } else {
+          this.$message({
+            showClose: true, type: 'error',
+            message: '操作失败，请重试'
+          });
+        }
+      });
     },
     // 加入收藏夹
     addToCollection() {
@@ -341,7 +343,7 @@ export default {
         this.loading = false;
       }
     },
-    // 结算
+    // 结算立即购买
     buyNow(state) {
       this.loadingBtn = true;
       let deal = {

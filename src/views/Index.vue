@@ -1211,45 +1211,39 @@ export default {
           // 2.用户二次确认
           this.$confirm('确认修改？').then(_ => {
             // 3.修改
-            let formData = new FormData();
-            formData.append("id", this.id);
-            formData.append("userName", this.userInfo.userName);
-            formData.append("phoneNumber", this.userInfo.phoneNumber);
-            formData.append("email", this.userInfo.email);
-            formData.append("shippingAddress", this.userInfo.shippingAddress);
-            axios({
-              method: "post",
-              url: "http://localhost:8081/user/updateUser",
-              headers: {
-                "Content-Type": "multipart/form-data"
-              },
-              withCredentials: true,
-              data: formData
-            }).then((resp) => {
-              if (resp.data === 1) {
-                sessionStorage.setItem("userName", this.userInfo.userName);
-                this.userName = this.userInfo.userName;
-                this.editUserInfo = false;
-                this.$message({
-                  showClose: true,
-                  center: true,
-                  type: 'success',
-                  message: '修改成功！即将打开个人信息'
-                });
-                // 延迟1000毫秒打开我的个人信息
-                setTimeout(() => {
-                  this.drawer_info = true;
-                }, 1000)
-              } else {
-                this.editUserInfo = false;
-                this.$message({
-                  showClose: true,
-                  center: true,
-                  type: 'error',
-                  message: '修改失败，请重试'
-                });
-              }
-            })
+            let data = {
+              id: this.id,
+              userName: this.userInfo.userName,
+              phoneNumber: this.userInfo.phoneNumber,
+              email: this.userInfo.email,
+              shippingAddress: this.userInfo.shippingAddress
+            };
+            axios.put("http://localhost:8081/user/updateUser",data)
+                .then((resp) => {
+                  if (resp.data === 1) {
+                    sessionStorage.setItem("userName", this.userInfo.userName);
+                    this.userName = this.userInfo.userName;
+                    this.editUserInfo = false;
+                    this.$message({
+                      showClose: true,
+                      center: true,
+                      type: 'success',
+                      message: '修改成功！即将打开个人信息'
+                    });
+                    // 延迟1000毫秒打开我的个人信息
+                    setTimeout(() => {
+                      this.drawer_info = true;
+                    }, 1000)
+                  } else {
+                    this.editUserInfo = false;
+                    this.$message({
+                      showClose: true,
+                      center: true,
+                      type: 'error',
+                      message: '修改失败，请重试'
+                    });
+                  }
+                })
           }).catch(_ => {
           });
         } else {
@@ -1290,34 +1284,28 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // 判断是否是游客
+        // 判断是否是游客，获取id
         let id = sessionStorage.getItem("id")==null?this.visitorId:this.id;
-        let formData = new FormData();
-        formData.append("id", id);
-        formData.append("bookId", bookId);
-        formData.append("quantity", quantity);
-        axios({
-          method: "post",
-          url: "http://localhost:8081/user/deleteCart",
-          headers: {
-            "Content-Type": "multipart/form-data"
-          },
-          withCredentials: true,
-          data: formData
-        }).then((resp) => {
-          if (resp.data === 1) {
-            this.myDelete_cart(rows, bookId);
-            this.$message({
-              type: 'success',
-              message: '移除成功!'
+        let data = {
+          id: id,
+          bookId: bookId,
+          quantity: quantity
+        };
+        axios.post("http://localhost:8081/user/deleteCart",data)
+            .then((resp) => {
+              if (resp.data === 1) {
+                this.myDelete_cart(rows, bookId);
+                this.$message({
+                  type: 'success',
+                  message: '移除成功!'
+                });
+              } else {
+                this.$message({
+                  type: 'error',
+                  message: '移除失败，请刷新后重试'
+                });
+              }
             });
-          } else {
-            this.$message({
-              type: 'error',
-              message: '移除失败，请刷新后重试'
-            });
-          }
-        });
       })
     },
     // 自定义的删除数组的方法
@@ -1347,15 +1335,20 @@ export default {
     },
     // 改变购物车中图书数量
     changeQuantity(currentValue, oldValue, row) {
-      // 判断是否是游客
+      // 判断是否是游客，获取id
       let id = sessionStorage.getItem("id")==null?this.visitorId:this.id;
-      let formData = new FormData();
+      /*let formData = new FormData();
       formData.append("id", id);
       formData.append("bookId", row.bookId);
       formData.append("quantity", row.quantity);
       formData.append("currentValue", currentValue);
-      formData.append("oldValue", oldValue);
-      axios({
+      formData.append("oldValue", oldValue);*/
+      let data = {
+        id: id,
+        bookId: row.bookId,
+        quantity: currentValue-oldValue
+      };
+      /*axios({
         method: "post",
         url: "http://localhost:8081/user/changeQuantity",
         headers: {
@@ -1363,19 +1356,21 @@ export default {
         },
         withCredentials: true,
         data: formData
-      }).then((resp) => {
-        if (resp.data === 1) {
-          this.$message({
-            type: 'success',
-            message: '修改成功!'
+      })*/
+      axios.put("http://localhost:8081/user/changeQuantity",data)
+          .then((resp) => {
+            if (resp.data === 1) {
+              this.$message({
+                type: 'success',
+                message: '修改成功!'
+              });
+            } else {
+              this.$message({
+                type: 'error',
+                message: '修改失败，请刷新后重试'
+              });
+            }
           });
-        } else {
-          this.$message({
-            type: 'error',
-            message: '修改失败，请刷新后重试'
-          });
-        }
-      });
     },
     // 选中的行
     handleSelectionChange(val) {
@@ -1498,38 +1493,28 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        let formData = new FormData();
-        formData.append("id", id);
-        formData.append("state", "4");
         this.loading = true;
-        axios({
-          method: "post",
-          url: "http://localhost:8081/deal/updateDealState",
-          headers: {
-            "Content-Type": "multipart/form-data"
-          },
-          withCredentials: true,
-          data: formData
-        }).then((resp) => {
-          this.loading = false;
-          if (resp.data === 1) {
-            for (let i = 0; i < this.dealData.length; i++) {
-              if (this.dealData[i].deal.id === id){
-                this.dealData[i].deal.state = 4;
-                break;
+        axios.post("http://localhost:8081/deal/updateDealState/"+id+"/4")
+            .then((resp) => {
+              this.loading = false;
+              if (resp.data === 1) {
+                for (let i = 0; i < this.dealData.length; i++) {
+                  if (this.dealData[i].deal.id === id){
+                    this.dealData[i].deal.state = 4;
+                    break;
+                  }
+                }
+                this.$message({
+                  message: '签收成功',
+                  type: 'success'
+                });
+              } else {
+                this.$message({
+                  message: '签收失败，请重试',
+                  type: 'error'
+                });
               }
-            }
-            this.$message({
-              message: '签收成功',
-              type: 'success'
             });
-          } else {
-            this.$message({
-              message: '签收失败，请重试',
-              type: 'error'
-            });
-          }
-        });
       })
     },
     // 去评论
@@ -1575,19 +1560,9 @@ export default {
           .then((resp) => {
             this.loadingBtn = false;
             if (resp.data === 1){
-              let formData = new FormData();
-              formData.append("id", this.dealId_comment);
-              formData.append("state", "5");
               this.loading = true;
-              axios({
-                method: "post",
-                url: "http://localhost:8081/deal/updateDealState",
-                headers: {
-                  "Content-Type": "multipart/form-data"
-                },
-                withCredentials: true,
-                data: formData
-              }).then((_resp) => {
+              axios.post("http://localhost:8081/deal/updateDealState/"+this.dealId_comment+"/5")
+                  .then((_resp) => {
                 this.loading = false;
                 if (_resp.data === 1) {
                   for (let i = 0; i < this.dealData.length; i++) {
@@ -1628,18 +1603,8 @@ export default {
       this.drawer_deal = false;
       this.payVisible = false;
       this.loadingBtn = true;
-      let formData = new FormData();
-      formData.append("dealId", this.dealId);
-      formData.append("payWay", this.payWay);
-      axios({
-        method: "post",
-        url: "http://localhost:8081/deal/pay",
-        headers: {
-          "Content-Type": "multipart/form-data"
-        },
-        withCredentials: true,
-        data: formData
-      }).then((resp) => {
+      axios.get("http://localhost:8081/deal/pay/"+this.dealId+"/"+this.payWay)
+      .then((resp) => {
         this.loadingBtn = false;
         if (resp.data === 1) {
           this.$message({
@@ -1663,17 +1628,8 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        let formData = new FormData();
-        formData.append("dealId", id);
-        axios({
-          method: "post",
-          url: "http://localhost:8081/deal/deleteDeal",
-          headers: {
-            "Content-Type": "multipart/form-data"
-          },
-          withCredentials: true,
-          data: formData
-        }).then((resp) => {
+        axios.delete("http://localhost:8081/deal/deleteDeal/"+id)
+        .then((resp) => {
           if (resp.data === 1) {
             this.myDelete_deal(rows,id);
             this.$message({
@@ -1727,31 +1683,21 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        let formData = new FormData();
-        formData.append("id", this.id);
-        formData.append("bookId", bookId);
-        axios({
-          method: "post",
-          url: "http://localhost:8081/user/deleteCollection",
-          headers: {
-            "Content-Type": "multipart/form-data"
-          },
-          withCredentials: true,
-          data: formData
-        }).then((resp) => {
-          if (resp.data === 1) {
-            this.myDelete_col(rows, bookId);
-            this.$message({
-              type: 'success',
-              message: '移除成功!'
+        axios.delete("http://localhost:8081/user/deleteCollection/"+this.id+"/"+bookId)
+            .then((resp) => {
+              if (resp.data === 1) {
+                this.myDelete_col(rows, bookId);
+                this.$message({
+                  type: 'success',
+                  message: '移除成功!'
+                });
+              } else {
+                this.$message({
+                  type: 'error',
+                  message: '移除失败，请刷新后重试'
+                });
+              }
             });
-          } else {
-            this.$message({
-              type: 'error',
-              message: '移除失败，请刷新后重试'
-            });
-          }
-        });
       })
     },
     // 自定义的删除数组的方法

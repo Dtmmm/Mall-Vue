@@ -96,42 +96,38 @@ export default {
     addToCart(index){
       let id = sessionStorage.getItem("id");
       if (id == null) {
+        id = sessionStorage.getItem("visitorId");
         this.$message({
           type: 'warning',
-          message: '您还未登录，请先登录！'
-        });
-      } else {
-        let formData = new FormData();
-        formData.append("id", sessionStorage.getItem("id"));
-        formData.append("bookId", this.books[index].id);
-        formData.append("quantity", "1");
-        axios({
-          method: "post",
-          url: "http://localhost:8081/user/addToCart",
-          headers: {
-            "Content-Type": "multipart/form-data"
-          },
-          withCredentials: true,
-          data: formData
-        }).then((resp) => {
-          if (resp.data === 1) {
-            this.$message({
-              showClose: true, type: 'success',
-              message: '添加成功！'
-            });
-          } else if (resp.data === 0) {
-            this.$message({
-              showClose: true, type: 'error',
-              message: '添加失败，库存不足'
-            });
-          } else {
-            this.$message({
-              showClose: true, type: 'error',
-              message: '操作失败，请重试'
-            });
-          }
+          message: '您当前未登录，购物车中的内容会随着会话结束而消失，请尽快登录！',
+          duration: 9000,
+          showClose: true
         });
       }
+      let data = {
+        id: id,
+        bookId: this.books[index].id,
+        quantity: 1
+      };
+      axios.post("http://localhost:8081/user/addToCart",data)
+          .then((resp) => {
+            if (resp.data === 1) {
+              this.$message({
+                showClose: true, type: 'success',
+                message: '添加成功！'
+              });
+            } else if (resp.data === 0) {
+              this.$message({
+                showClose: true, type: 'error',
+                message: '添加失败，库存不足'
+              });
+            } else {
+              this.$message({
+                showClose: true, type: 'error',
+                message: '操作失败，请重试'
+              });
+            }
+          });
     },
     // 加入收藏
     addToCollection(index){
@@ -142,35 +138,25 @@ export default {
           message: '您还未登录，请先登录！'
         });
       } else {
-        let formData = new FormData();
-        formData.append("id", sessionStorage.getItem("id"));
-        formData.append("bookId", this.books[index].id);
-        axios({
-          method: "post",
-          url: "http://localhost:8081/user/addToCollection",
-          headers: {
-            "Content-Type": "multipart/form-data"
-          },
-          withCredentials: true,
-          data: formData
-        }).then((resp) => {
-          if (resp.data === 1) {
-            this.$message({
-              showClose: true, type: 'success',
-              message: '添加成功！'
+        axios.post("http://localhost:8081/user/addToCollection/"+id+"/"+this.books[index].id)
+            .then((resp) => {
+              if (resp.data === 1) {
+                this.$message({
+                  showClose: true, type: 'success',
+                  message: '添加成功！'
+                });
+              } else if (resp.data === 0) {
+                this.$message({
+                  showClose: true,
+                  message: '该图书已在收藏夹中'
+                });
+              } else {
+                this.$message({
+                  showClose: true, type: 'error',
+                  message: '操作失败，请重试'
+                });
+              }
             });
-          } else if (resp.data === 0) {
-            this.$message({
-              showClose: true,
-              message: '该图书已在收藏夹中'
-            });
-          } else {
-            this.$message({
-              showClose: true, type: 'error',
-              message: '操作失败，请重试'
-            });
-          }
-        });
       }
     },
     // 初始化页面数据

@@ -215,54 +215,34 @@ export default {
     },
     // 发货操作
     ship(id){
-      let formData = new FormData();
-      formData.append("id", id);
-      formData.append("state", "3");
       this.loading = true;
-      axios({
-        method: "post",
-        url: "http://localhost:8081/deal/updateDealState",
-        headers: {
-          "Content-Type": "multipart/form-data"
-        },
-        withCredentials: true,
-        data: formData
-      }).then(resp => {
-        this.loading = false;
-        if (resp.data === 1) {
-          for (let i = 0; i < this.dealData.length; i++) {
-            if (this.dealData[i].deal.id === id){
-              this.dealData[i].deal.state = 3;
-              break;
+      axios.post("http://localhost:8081/deal/updateDealState/"+id+"/3")
+          .then(resp => {
+            this.loading = false;
+            if (resp.data === 1) {
+              for (let i = 0; i < this.dealData.length; i++) {
+                if (this.dealData[i].deal.id === id){
+                  this.dealData[i].deal.state = 3;
+                  break;
+                }
+              }
+              this.$message({
+                message: '成功发货',
+                type: 'success'
+              });
+            } else {
+              this.$message({
+                message: '操作失败，请重试',
+                type: 'error'
+              });
             }
-          }
-          this.$message({
-            message: '成功发货',
-            type: 'success'
           });
-        } else {
-          this.$message({
-            message: '操作失败，请重试',
-            type: 'error'
-          });
-        }
-      });
     },
     // 完成订单
     finishDeal(id){
-      let formData = new FormData();
-      formData.append("id", id);
-      formData.append("state", "1");
       this.loading = true;
-      axios({
-        method: "post",
-        url: "http://localhost:8081/deal/updateDealState",
-        headers: {
-          "Content-Type": "multipart/form-data"
-        },
-        withCredentials: true,
-        data: formData
-      }).then(resp => {
+      axios.post("http://localhost:8081/deal/updateDealState/"+id+"/1")
+          .then(resp => {
             this.loading = false;
             if (resp.data === 1) {
               for (let i = 0; i < this.dealData.length; i++) {
@@ -271,17 +251,17 @@ export default {
                   break;
                 }
               }
-          this.$message({
-            message: '操作成功',
-            type: 'success'
+            this.$message({
+              message: '操作成功',
+              type: 'success'
+            });
+            } else {
+              this.$message({
+                message: '操作失败，请重试',
+                type: 'error'
+              });
+            }
           });
-        } else {
-          this.$message({
-            message: '操作失败，请重试',
-            type: 'error'
-          });
-        }
-      });
     },
     initData(){
       this.loading = true;

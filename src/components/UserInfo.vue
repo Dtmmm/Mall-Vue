@@ -137,30 +137,21 @@ export default {
     },
     // 删除
     deleteRow(rows, id) {
-      let formData = new FormData();
-      formData.append("id", id);
-      axios({
-        method: "post",
-        url: "http://localhost:8081/backstage/deleteUserById",
-        headers: {
-          "Content-Type": "multipart/form-data"
-        },
-        withCredentials: true,
-        data: formData
-      }).then((resp) => {
-        if (resp.data === 1) {
-          this.myDelete(rows,id);
-          this.$message({
-            showClose: true, type: 'success',
-            message: '删除成功！'
+      axios.delete("http://localhost:8081/backstage/deleteUserById/"+id)
+          .then((resp) => {
+            if (resp.data === 1) {
+              this.myDelete(rows,id);
+              this.$message({
+                showClose: true, type: 'success',
+                message: '删除成功！'
+              });
+            } else {
+              this.$message({
+                showClose: true, type: 'error',
+                message: '删除失败，请重试'
+              });
+            }
           });
-        } else {
-          this.$message({
-            showClose: true, type: 'error',
-            message: '删除失败，请重试'
-          });
-        }
-      });
     },
     // 自定义的删除数组的方法
     myDelete(rows, id){

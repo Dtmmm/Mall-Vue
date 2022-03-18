@@ -236,6 +236,7 @@ export default {
     },
     // 加入购物车
     addToCart() {
+      console.log("===========")
       let id = sessionStorage.getItem("id");
       if (id == null) {
         id = sessionStorage.getItem("visitorId");
@@ -260,7 +261,7 @@ export default {
                 type: 'success',
                 message: '添加成功！'
               });
-            } else if (resp.data === 0) {
+            } else if (resp.data === 2) {
               this.$message({
                 type: 'error',
                 message: '添加失败，库存不足'

@@ -109,7 +109,7 @@ export default {
                 showClose: true, type: 'success',
                 message: '添加成功！'
               });
-            } else if (resp.data === 0) {
+            } else if (resp.data === 2) {
               this.$message({
                 showClose: true, type: 'error',
                 message: '添加失败，库存不足'

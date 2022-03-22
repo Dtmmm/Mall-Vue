@@ -264,7 +264,7 @@ export default {
             userName: this.registerForm.userName,
             shippingAddress: this.registerForm.shippingAddress
           };
-          axios.put("http://localhost:8081/user/register",user)
+          axios.post("http://localhost:8081/user/register",user)
           .then((resp) => {
             this.loadingBtn = false;
            if (resp.data === 1){

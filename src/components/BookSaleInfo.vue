@@ -2,10 +2,14 @@
   <div>
     <div>
       <el-row :gutter="20">
-        <el-col :span="5" style="margin-top: 8px"><span style="font-size: 20px;">书名: {{ this.bookName }}</span></el-col>
-        <el-col :span="9" style="margin-top: 8px"><span style="font-size: 20px;">编号：{{ this.bookId }}</span></el-col>
+        <el-col :span="5" style="margin-top: 8px"><span style="font-size: 17px;">书名: {{ this.bookName }}</span></el-col>
+        <el-col :span="8" style="margin-top: 8px"><span style="font-size: 17px;">编号：{{ this.bookId }}</span></el-col>
+        <el-col :span="2">
+          <el-button v-if="this.flag" type="primary" round icon="el-icon-printer" size="medium" @click="exportExcel" :loading="this.loading">导出</el-button>
+          <el-button v-else type="primary" round icon="el-icon-printer" size="medium" disabled>导出</el-button>
+        </el-col>
         <el-col :span="3">
-          <el-select v-show="this.flag" v-model="year" placeholder="请选择年份" @change="changeYear">
+          <el-select v-if="this.flag" v-model="year" placeholder="请选择年份" @change="changeYear">
             <el-option
                 v-for="item in options"
                 :key="item.value"
@@ -13,10 +17,10 @@
                 :value="item.value">
             </el-option>
           </el-select>
-          <el-select v-show="!this.flag" placeholder="请选择年份" disabled value=""></el-select>
+          <el-select v-else placeholder="请选择年份" disabled value=""></el-select>
         </el-col>
-        <el-col :span="7">
-          <el-input style="margin-left: 0;width: 300px;" placeholder="请输入书名或图书编号"
+        <el-col :span="6">
+          <el-input style="margin-left: 0;width: 280px;" placeholder="请输入图书名或编号"
                     clearable prefix-icon="el-icon-search" v-model="condition">
             <el-button slot="append" @click="search">搜索</el-button>
           </el-input>
@@ -57,20 +61,21 @@ export default {
       options: [
         {
           value: '2021',
-          label: '2021-2022 年'
+          label: '2021-2022年'
         }, {
           value: '2020',
-          label: '2020-2021 年'
+          label: '2020-2021年'
         }, {
           value: '2019',
-          label: '2019-2020 年'
+          label: '2019-2020年'
         }, {
           value: '2018',
-          label: '2018-2019 年'
+          label: '2018-2019年'
         }
       ],
       year: '',
-      flag: false
+      flag: false,
+      loading: false
     }
   },
   mounted() {
@@ -208,6 +213,8 @@ export default {
               this.flag = true;
               this.bookId = resp.data.id;
               this.bookName = resp.data.bookName;
+              this.year = "2021";
+              this.randomData();
             }
           });
     },
@@ -248,8 +255,8 @@ export default {
     },
     // 生成随机顾客评价
     randomCustomerReviews() {
-      this.oneStar = this.randomNum(100, 500);
-      this.twoStar = this.randomNum(100, 500);
+      this.oneStar = this.randomNum(100, 400);
+      this.twoStar = this.randomNum(100, 400);
       this.threeStar = this.randomNum(300, 600);
       this.fourStar = this.randomNum(400, 800);
       this.fiveStar = this.randomNum(700, 1200);
@@ -283,6 +290,69 @@ export default {
     // 改变年份
     changeYear(){
       this.randomData();
+    },
+    // 导出Excel
+    exportExcel(){
+      this.loading = true;
+      let data = this.getData();
+      axios.post("http://localhost:8081/backstage/exportBookExcel",data,{responseType:'blob'})
+          .then((resp) =>{
+            this.download(resp.data);
+            this.loading = false;
+            this.$message({
+              message: '导出数据完成，已开始下载',
+              type: 'success'
+            });
+          })
+          .catch((err) => {console.log(err)});
+    },
+    // 生成数据
+    getData(){
+      let salesVolume = [];
+      let collection = [];
+      let clicks = [];
+      for (let i = 0; i < 4; i++) {
+        let salesVolumeData = [];
+        for (let i = 0; i < 12; i++) {
+          salesVolumeData[i] = this.randomNum(100, 500);
+        }
+        salesVolume.push(salesVolumeData);
+
+        let collectionData = [];
+        for (let i = 0; i < 12; i++) {
+          collectionData[i] = this.randomNum(300, 700);
+        }
+        collection.push(collectionData);
+
+        let clicksData = [];
+        for (let i = 0; i < 12; i++) {
+          clicksData[i] = this.randomNum(800, 1300);
+        }
+        clicks.push(clicksData);
+      }
+
+      return {
+        bookId: this.bookId,
+        salesVolume: salesVolume,
+        collection: collection,
+        clicks: clicks,
+        rate: [this.oneStar, this.twoStar, this.threeStar, this.fourStar, this.fiveStar]
+      };
+    },
+    // ajax不能下载文件，因此得自己定义方法下载
+    download(data){
+      if (!data) {
+        return;
+      }
+      let url = window.URL.createObjectURL(new Blob([data]));
+      let link = document.createElement('a');
+      link.style.display = 'none';
+      link.href = url;
+      link.setAttribute('download', this.bookName+'-图书销售情况.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
     }
   }
 }

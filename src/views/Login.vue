@@ -17,7 +17,7 @@
             <el-col :span="12">
               <div style="height: 501px;width: 490px">
                 <div id="LoginForm">
-                  <div class="title">登录</div>
+                  <div class="title">登 录</div>
                   <el-form :model="loginForm" :rules="loginRules" ref="loginForm" label-width="50px" hide-required-asterisk>
                     <el-form-item label="账号" prop="userId">
                       <el-input @focus="clearError" v-model="loginForm.userId" clearable></el-input>
@@ -40,14 +40,14 @@
               <div style="height: 501px;width: 490px">
                 <div style="position: relative">
                   <div id="img" class="image" style="position: absolute;z-index: 10;">
-                    <el-image :src="require('../assets/img/sc.jpg')" style="height: 501px;width: 490px;">
+                    <el-image :src="require('../assets/img/'+randomPicture)" style="height: 501px;width: 490px;">
                       <div slot="placeholder" class="image-slot">
                         <i class="el-icon-picture-outline"></i>
                       </div>
                     </el-image>
                   </div>
                   <div v-show="load" id="RegisterForm">
-                    <div class="title" >注册</div>
+                    <div class="title" >注 册</div>
                     <el-form :model="registerForm" :rules="registerRules" ref="registerForm" label-width="80px">
                       <el-form-item label="账号" prop="userId">
                         <el-input v-model="registerForm.userId" clearable></el-input>
@@ -68,9 +68,9 @@
                       </el-form-item>
                       <div :class="registerForm.result === 0?'showError':'hiddenError'" id="errorText">用户名或密码错误</div>
                       <el-form-item>
-                        <div>
+                        <div style="margin-left: -40px">
                           <el-button style="width: 100px" @click="toLogin" plain><i class="el-icon-caret-left"></i> 去登录</el-button>
-                          <el-button style="margin-left: 100px;width: 100px" :loading="loadingBtn"
+                          <el-button style="margin-left: 120px;width: 100px" :loading="loadingBtn"
                                      type="primary" @click="register('registerForm')">注 册
                           </el-button>
                         </div>
@@ -210,7 +210,8 @@ export default {
         shippingAddress: [{ validator: shippingAddress, trigger: 'blur' }]
       },
       loadingBtn: false,
-      load: false
+      load: false,
+      randomPicture: ''
     };
   },
   methods: {
@@ -321,6 +322,8 @@ export default {
     setTimeout(() => {
       this.load = true;
     }, 1000);
+    const name = ['login1.png','login2.png','login3.png'];
+    this.randomPicture = name[Math.floor(Math.random()*3)]
   }
 }
 </script>

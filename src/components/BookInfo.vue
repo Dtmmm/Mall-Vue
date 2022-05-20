@@ -32,10 +32,10 @@
                     <el-descriptions-item label="出版日期">{{ props.row.publicationDate }}</el-descriptions-item>
                     <el-descriptions-item label="库存">{{ props.row.inventory }}</el-descriptions-item>
                     <el-descriptions-item label="累计销售量">{{ props.row.sales }}</el-descriptions-item>
-                    <el-descriptions-item label="状态">{{ props.row.state }}</el-descriptions-item>
+                    <el-descriptions-item label="状态">{{ stateFormat(props.row.state) }}</el-descriptions-item>
                     <el-descriptions-item label="折扣">{{ props.row.discount }}</el-descriptions-item>
                     <el-descriptions-item label="类别">{{ props.row.classificationCode }}</el-descriptions-item>
-                    <el-descriptions-item label="图片">{{ props.row.img }}</el-descriptions-item>
+                    <el-descriptions-item label="ISBN码">{{ props.row.isbn }}</el-descriptions-item>
                     <el-descriptions-item label="简介" :labelStyle="'width:45px;'">{{ props.row.brief }}
                     </el-descriptions-item>
                   </el-descriptions>
@@ -151,6 +151,7 @@
         </el-form-item>
         <el-form-item label="状态" prop="state">
           <el-select v-model="book.state" placeholder="请选择状态" style="width: 300px">
+            <el-option label="不展示" :value="0"></el-option>
             <el-option label="最新上架" :value="1"></el-option>
             <el-option label="独家畅品" :value="2"></el-option>
             <el-option label="重点推荐" :value="3"></el-option>
@@ -179,12 +180,15 @@
         <el-form-item label="图片" prop="img">
           <el-input v-model="book.img" clearable style="width: 300px"></el-input>
         </el-form-item>
+        <el-form-item label="ISBN码" prop="isbn">
+          <el-input v-model="book.isbn" clearable style="width: 300px"></el-input>
+        </el-form-item>
         <el-form-item label="简介" prop="brief">
           <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4}" v-model.trim="book.brief" clearable
                     style="width: 500px"></el-input>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
+      <div slot="footer" class="dialog-footer" style="margin-top: -40px">
         <el-button @click="resetForm('editBook')">重 置</el-button>
         <el-button type="primary" @click="submitEdit('editBook')">确 定</el-button>
       </div>
@@ -192,7 +196,7 @@
     <el-dialog title="添加" destroy-on-close :visible.sync="addBookVisible" v-if="addBookVisible" width="60%" style="margin-top: -50px">
       <el-form :inline="true" :model="book_add" :rules="rules" ref="addBook" label-width="100px" status-icon>
         <el-form-item label="编号">
-          <el-input v-model="book_add.id" readonly style="width: 300px" placeholder="编号由数据库生成"></el-input>
+          <el-input v-model="book_add.id" readonly style="width: 300px" placeholder="编号自动生成"></el-input>
         </el-form-item>
         <el-form-item label="书名" prop="bookName">
           <el-input v-model.trim="book_add.bookName" clearable style="width: 300px"></el-input>
@@ -248,12 +252,15 @@
         <el-form-item label="图片" prop="img">
           <el-input v-model="book_add.img" clearable style="width: 300px"></el-input>
         </el-form-item>
+        <el-form-item label="ISBN码" prop="isbn">
+          <el-input v-model="book_add.isbn" clearable style="width: 300px"></el-input>
+        </el-form-item>
         <el-form-item label="简介" prop="brief">
           <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4}" v-model.trim="book_add.brief" clearable
                     style="width: 500px"></el-input>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
+      <div slot="footer" class="dialog-footer" style="margin-top: -40px">
         <el-button @click="resetForm('addBook')">重 置</el-button>
         <el-button type="primary" @click="submitAdd('addBook')">确 定</el-button>
       </div>
@@ -272,12 +279,12 @@ export default {
       keyWord: '',
       select: 'book_name',
       book: {
-        id: '', bookName: '', author: '', price: 0, press: '', publicationDate: '',
-        inventory: 0, sales: 0, brief: '', state: 0, discount: 1, classificationCode: '', img: ''
+        id: '', bookName: '', author: '', price: 0, press: '', publicationDate: '',inventory: 0,
+        sales: 0, brief: '', state: 0, discount: 1, classificationCode: '', img: '', isbn: ''
       },
       book_add: {
-        id: '', bookName: '', author: '', price: 0, press: '', publicationDate: '',
-        inventory: 2000, sales: 0, brief: '', state: 0, discount: 1, classificationCode: '', img: '/static/img/book/'
+        id: '', bookName: '', author: '', price: 0, press: '', publicationDate: '',inventory: 0,
+        sales: 0, brief: '', state: 0, discount: 1, classificationCode: '', img: '/static/img/book/', isbn: ''
       },
       editBookVisible: false,
       addBookVisible: false,
@@ -316,7 +323,10 @@ export default {
           {required: true, message: '请选择一个分类', trigger: 'blur'}
         ],
         img: [
-          {required: false, message: '请选择图片', trigger: 'blur'}
+          {required: true, message: '请选择图片', trigger: 'blur'}
+        ],
+        isbn: [
+          {required: true, message: '请输入ISBN码', trigger: 'blur'}
         ]
       },
       options: [
@@ -536,6 +546,20 @@ export default {
               this.bookData = resp.data;
               this.loading = false;
             })
+      }
+    },
+    // 格式化状态
+    stateFormat(state){
+      if (state === 0){
+        return '不展示';
+      } else if (state === 1){
+        return '最新上架';
+      } else if (state === 2){
+        return '独家畅品';
+      } else if (state === 3){
+        return '重点推荐';
+      } else if (state === 4){
+        return '好评发售';
       }
     },
     // 删除
